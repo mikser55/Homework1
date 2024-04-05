@@ -16,22 +16,24 @@ public class Counter : MonoBehaviour
             ToggleCounterValue();
 
             if (_isCounterOn)
-                _coroutine = StartCoroutine(Coroutine());
+                _coroutine = StartCoroutine(RunCounter());
             else
                 StopCoroutine(_coroutine);
         }
     }
 
-    private IEnumerator Coroutine()
+    private IEnumerator RunCounter()
     {
         bool isWork = true;
+
+        WaitForSeconds wait = new WaitForSeconds(_delay);
 
         while (isWork)
         {
             _count++;
             Debug.Log(_count);
 
-            yield return new WaitForSeconds(_delay);
+            yield return wait;
         }
     }
 
