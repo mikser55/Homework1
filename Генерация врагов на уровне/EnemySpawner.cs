@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _originalEnemy;
+    [SerializeField] private EnemyController _originalEnemy;
     [SerializeField] private float spawnWaitTime = 2f;
     [SerializeField] private List<Transform> _positions;
 
@@ -36,8 +36,8 @@ public class EnemySpawner : MonoBehaviour
             float randomDirection = directionNumber[Random.Range(0, directionNumber.Length)];
             Transform position = _positions[Random.Range(0, _positions.Count)];
             _direction = new Vector3(randomDirection, 0, randomDirection);
-            GameObject enemyCopy = Instantiate(_originalEnemy, position.position, Quaternion.identity);
-            enemyCopy.GetComponent<EnemyController>().SetPosition(_direction);
+            EnemyController enemy = Instantiate(_originalEnemy, position.position, Quaternion.identity);
+            enemy.SetPosition(_direction);
 
             yield return wait;
         }
