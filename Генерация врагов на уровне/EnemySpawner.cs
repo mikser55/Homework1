@@ -12,11 +12,14 @@ public class EnemySpawner : MonoBehaviour
     private Vector3 _direction;
     private Coroutine _coroutine;
 
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyUp(KeyCode.E))
         {
-            ToggleSpawner();
+            if (_isWork)
+                TurnOffSpawner();
+            else
+                TurnOnSpawner();
 
             if (_isWork)
                 _coroutine = StartCoroutine(SpawnEnemy());
@@ -37,14 +40,19 @@ public class EnemySpawner : MonoBehaviour
             Transform position = _positions[Random.Range(0, _positions.Count)];
             _direction = new Vector3(randomDirection, 0, randomDirection);
             EnemyController enemy = Instantiate(_originalEnemy, position.position, Quaternion.identity);
-            enemy.SetPosition(_direction);
+            enemy.SetDirection(_direction);
 
             yield return wait;
         }
     }
 
-    private void ToggleSpawner()
+    private void TurnOnSpawner()
     {
-        _isWork = !_isWork;
+        _isWork = true;
+    }
+
+    private void TurnOffSpawner()
+    {
+        _isWork = false;
     }
 }
