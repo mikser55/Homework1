@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private EnemyController _originalEnemy;
-    [SerializeField] private float spawnWaitTime = 2f;
+    [SerializeField] private EnemyMovement _enemyPrefab;
+    [SerializeField] private float _delay = 2f;
     [SerializeField] private List<Transform> _positions;
 
     private bool _isWork = false;
@@ -17,9 +17,9 @@ public class EnemySpawner : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.E))
         {
             if (_isWork)
-                TurnOffSpawner();
+                TurnOff();
             else
-                TurnOnSpawner();
+                TurnOn();
 
             if (_isWork)
                 _coroutine = StartCoroutine(SpawnEnemy());
@@ -32,26 +32,26 @@ public class EnemySpawner : MonoBehaviour
     {
         int[] directionNumber = { -1, 1 };
 
-        WaitForSeconds wait = new WaitForSeconds(spawnWaitTime);
+        WaitForSeconds wait = new WaitForSeconds(_delay);
 
         while (_isWork)
         {
             float randomDirection = directionNumber[Random.Range(0, directionNumber.Length)];
-            Transform position = _positions[Random.Range(0, _positions.Count)];
+            Transform randomPosition = _positions[Random.Range(0, _positions.Count)];
             _direction = new Vector3(randomDirection, 0, randomDirection);
-            EnemyController enemy = Instantiate(_originalEnemy, position.position, Quaternion.identity);
+            EnemyMovement enemy = Instantiate(_enemyPrefab, randomPosition.position, Quaternion.identity);
             enemy.SetDirection(_direction);
 
             yield return wait;
         }
     }
 
-    private void TurnOnSpawner()
+    private void TurnOn()
     {
         _isWork = true;
     }
 
-    private void TurnOffSpawner()
+    private void TurnOff()
     {
         _isWork = false;
     }
