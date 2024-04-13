@@ -5,7 +5,7 @@ public class Shooting : MonoBehaviour
 {
     [SerializeField] private float _shotSpeed;
     [SerializeField] private float _timeWaitShooting;
-    [SerializeField] private GameObject _bullet;
+    [SerializeField] private Rigidbody _bulletPrefab;
 
     private Transform _target;
 
@@ -18,15 +18,17 @@ public class Shooting : MonoBehaviour
     {
         bool isWork = true;
 
+        WaitForSeconds wait = new WaitForSeconds(_timeWaitShooting);
+
         while (isWork)
         {
             Vector3 shotDirection = (_target.position - transform.position).normalized;
-            GameObject newBullet = Instantiate(_bullet, transform.position + shotDirection, Quaternion.identity);
+            Rigidbody newBullet = Instantiate(_bulletPrefab, transform.position + shotDirection, Quaternion.identity);
 
             newBullet.transform.up = shotDirection;
             newBullet.GetComponent<Rigidbody>().velocity = shotDirection * _shotSpeed;
 
-            yield return new WaitForSeconds(_timeWaitShooting);
+            yield return wait;
         }
     }
 }

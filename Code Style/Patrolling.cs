@@ -15,7 +15,7 @@ public class Patrolling : MonoBehaviour
         _places = new Transform[_destinationPoint.childCount];
 
         for (int i = 0; i < _destinationPoint.childCount; i++)
-            _places[i] = _destinationPoint.GetChild(i).GetComponent<Transform>();
+            _places[i] = _destinationPoint.GetChild(i).gameObject.transform;
     }
 
     private void Update()
