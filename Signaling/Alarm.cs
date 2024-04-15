@@ -10,7 +10,7 @@ public class Alarm : MonoBehaviour
 
     private float _maxVolume = 1f;
     private float _minVolume = 0f;
-    private bool _increase = false;
+    private bool _isIncreasing = false;
     private AudioSource _alarmSound;
     private Coroutine _changeVolumeCoroutine;
 
@@ -18,32 +18,32 @@ public class Alarm : MonoBehaviour
     private void Start()
     {
         _alarmSound = GetComponent<AudioSource>();
+        _alarmSound.volume = 0f;
         EventEnter.Entered += RunAlarm;
         EventExit.Exited += TurnOffAlarm;
-        _alarmSound.volume = 0f;
     }
 
     private void RunAlarm()
     {
-        _increase = true;
+        _isIncreasing = true;
 
-            if (_alarmSound.volume == 0)
-                _alarmSound.Play();
+        if (_alarmSound.volume == 0)
+            _alarmSound.Play();
 
-            if (_changeVolumeCoroutine != null)
-                StopCoroutine(_changeVolumeCoroutine);
+        if (_changeVolumeCoroutine != null)
+            StopCoroutine(_changeVolumeCoroutine);
 
-            _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(_increase));
+        _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(_isIncreasing));
     }
 
     private void TurnOffAlarm()
     {
-        _increase = false;
+        _isIncreasing = false;
 
-            if (_changeVolumeCoroutine != null)
-                StopCoroutine(_changeVolumeCoroutine);
+        if (_changeVolumeCoroutine != null)
+            StopCoroutine(_changeVolumeCoroutine);
 
-            _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(_increase));
+        _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(_isIncreasing));
     }
 
     private void OnDestroy()
