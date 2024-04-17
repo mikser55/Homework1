@@ -2,13 +2,22 @@ using UnityEngine;
 
 public class Sensor : MonoBehaviour
 {
+    private EventExit _eventExit;
+    private EventEnter _eventEnter;
+
+    private void Start()
+    {
+        _eventExit = GetComponent<EventExit>();
+        _eventEnter = GetComponent<EventEnter>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        EventEnter.OnEntered();
+        _eventEnter.OnEntered();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        EventExit.OnExited();
+        _eventExit.OnExited();
     }
 }
