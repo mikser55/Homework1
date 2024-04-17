@@ -2,78 +2,68 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(Sensor))]
 public class Alarm : MonoBehaviour
 {
     [SerializeField] private float _delay = 1f;
     [SerializeField] private float _volumeChangingStep = 0.1f;
 
-    private EventEnter _eventEnter;
-    private EventExit _eventExit;
+    private Sensor _sensor;
     private float _maxVolume = 1f;
     private float _minVolume = 0f;
-    private bool _isIncreasing = false;
     private AudioSource _alarmSound;
     private Coroutine _changeVolumeCoroutine;
 
     private void Awake()
     {
         _alarmSound = GetComponent<AudioSource>();
-        _eventEnter = GetComponent<EventEnter>();
-        _eventExit = GetComponent<EventExit>();        
+        _sensor = GetComponent<Sensor>();
     }
 
     private void Start()
     {
-        _eventEnter.Entered += RunAlarm;
-        _eventExit.Exited += TurnOffAlarm;
+        _sensor.Entered += RunAlarm;
+        _sensor.Exited += TurnOffAlarm;
         _alarmSound.volume = 0f;
     }
 
     private void RunAlarm()
     {
-        _isIncreasing = true;
-
         if (_alarmSound.volume == 0)
             _alarmSound.Play();
 
-        StartChangingVolume();
+        StartChangingVolume(_maxVolume);
     }
 
     private void TurnOffAlarm()
     {
-        _isIncreasing = false;
-
-        StartChangingVolume();
+        StartChangingVolume(_minVolume);
     }
 
-    private void StartChangingVolume()
+    private void StartChangingVolume(float targetVolume)
     {
         if (_changeVolumeCoroutine != null)
             StopCoroutine(_changeVolumeCoroutine);
 
-        _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(_isIncreasing));
+        _changeVolumeCoroutine = StartCoroutine(RunVolumeCoroutine(targetVolume));
     }
 
-    private IEnumerator RunVolumeCoroutine(bool isIncrease)
+    private IEnumerator RunVolumeCoroutine(float targetVolume)
     {
         WaitForSeconds wait = new WaitForSeconds(_delay);
-        bool isWork = true;
 
-        while (isWork)
+        while (_alarmSound.volume != targetVolume)
         {
-            if (isIncrease)
+            if (_alarmSound.volume < targetVolume)
                 ChangeVolume(_maxVolume);
             else
                 ChangeVolume(_minVolume);
 
-            if (_alarmSound.volume == 0f)
-            {
-                StopCoroutine(_changeVolumeCoroutine);
-                _alarmSound.Stop();
-            }
-
             yield return wait;
         }
+
+        if (_alarmSound.volume == 0f)
+            _alarmSound.Stop();
     }
 
     private void ChangeVolume(float targetVolume)
@@ -83,7 +73,7 @@ public class Alarm : MonoBehaviour
 
     private void OnDestroy()
     {
-        _eventExit.Exited -= TurnOffAlarm;
-        _eventEnter.Entered -= RunAlarm;
+        _sensor.Exited -= TurnOffAlarm;
+        _sensor.Entered -= RunAlarm;
     }
 }

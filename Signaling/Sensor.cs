@@ -1,23 +1,30 @@
 using UnityEngine;
+using System;
 
 public class Sensor : MonoBehaviour
 {
-    private EventExit _eventExit;
-    private EventEnter _eventEnter;
-
-    private void Start()
-    {
-        _eventExit = GetComponent<EventExit>();
-        _eventEnter = GetComponent<EventEnter>();
-    }
+    public event Action Entered;
+    public event Action Exited;
 
     private void OnTriggerEnter(Collider other)
     {
-        _eventEnter.OnEntered();
+        if (other.gameObject.tag == "Player")
+            OnEntered();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        _eventExit.OnExited();
+        if (other.gameObject.tag == "Player")
+            OnExited();
+    }
+
+    public void OnExited()
+    {
+        Exited?.Invoke();
+    }
+
+    public void OnEntered()
+    {
+        Entered?.Invoke();
     }
 }
