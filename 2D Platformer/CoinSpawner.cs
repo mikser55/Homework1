@@ -3,40 +3,34 @@ using UnityEngine;
 
 public class CoinSpawner : MonoBehaviour
 {
+    [SerializeField] private Coin _coin;
     [SerializeField] private float _spawnTime = 5f;
-    [SerializeField] private GameObject _coinPrefab;
     [SerializeField] Transform _spawnPosition;
 
-    private int _maxCoins = 1;
-    private int _currentNumberCoins = 0;
-    private GameObject _currentCoin;
-
-    private void Start()
+    private void OnEnable()
     {
-        _currentCoin = Instantiate(_coinPrefab, _spawnPosition.position, Quaternion.identity);
-        _currentNumberCoins++;
+        _coin.CoinCollected += RespawnCoin;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void RespawnCoin()
     {
-        if (collision.gameObject.CompareTag("Player") && _currentCoin != null)
-        {
-            Destroy(_currentCoin);
-            _currentNumberCoins--;
-            StartCoroutine(SpawnCoinsCoroutine());
-        }
+        StartCoroutine(SpawnCoinsCoroutine());
     }
 
     private IEnumerator SpawnCoinsCoroutine()
     {
-        WaitForSeconds wait = new WaitForSeconds(_spawnTime);
+        WaitForSeconds wait = new(_spawnTime);
 
-        while (_currentNumberCoins < _maxCoins)
+        yield return wait;
+
+        while (_coin.gameObject.activeSelf != true)
         {
-            yield return wait;
-
-            _currentCoin = Instantiate(_coinPrefab, _spawnPosition.position, Quaternion.identity);
-            _currentNumberCoins++;
+            _coin.gameObject.SetActive(true);
         }
+    }
+
+    private void OnDisable()
+    {
+        _coin.CoinCollected -= RespawnCoin;
     }
 }

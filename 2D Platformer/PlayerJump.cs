@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(AnimationController))]
 public class PlayerJump : MonoBehaviour
 {
     [SerializeField] private float _jumpForce;
@@ -10,9 +8,9 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private float _groundCheckRadius;
     [SerializeField] private int _amountOfJumps = 2;
-    [SerializeField] private Animator _animator;
     [SerializeField] private Rigidbody2D _rigidbody;
 
+    private AnimationController _animator;
     private PlayerInput _playerInput;
     private bool _canJump;
     private int _amountOfJumpsLeft;
@@ -20,15 +18,16 @@ public class PlayerJump : MonoBehaviour
 
     private void Start()
     {
-        _amountOfJumpsLeft = _amountOfJumps;
+        _animator = GetComponent<AnimationController>();
         _playerInput = new();
+        _amountOfJumpsLeft = _amountOfJumps;
     }
 
     void Update()
     {
         GetInput();
         GetJumpsInfo();
-        UpdateAnimations();
+        _animator.UpdateJump(_isGrounded, _rigidbody.velocity.y, _amountOfJumpsLeft);
     }
 
     private void FixedUpdate()
@@ -68,12 +67,5 @@ public class PlayerJump : MonoBehaviour
 
         if (_isGrounded == false && _amountOfJumpsLeft == _amountOfJumps)
             _amountOfJumpsLeft = 1;
-    }
-
-    private void UpdateAnimations()
-    {
-        _animator.SetBool("IsGrounded", _isGrounded);
-        _animator.SetFloat("yVelocity", _rigidbody.velocity.y);
-        _animator.SetInteger("amountOfJumpsLeft", _amountOfJumpsLeft);
     }
 }
