@@ -1,13 +1,18 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMover : MonoBehaviour
 {
     [SerializeField] private float _speed;
     [SerializeField] private Animator _animator;
-    [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Rigidbody2D _rigidbody;
 
+    private PlayerInput _playerInput;
     private float _horizontalInput;
+
+    private void Start()
+    {
+        _playerInput = new();
+    }
 
     private void Update()
     {
@@ -28,15 +33,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void GetInput()
     {
-        _horizontalInput = Input.GetAxisRaw("Horizontal");
+        _horizontalInput = _playerInput.GetHorizontalInput();
     }
 
     private void ChangeMovementDirection()
     {
         if (_horizontalInput > 0)
-            _spriteRenderer.flipX = false;
+            transform.eulerAngles = new Vector3(0f, 0f, 0f);
         else if (_horizontalInput < 0)
-            _spriteRenderer.flipX = true;
+            transform.eulerAngles = new Vector3(0f, 180f, 0f);
     }
 
     private void UpdateAnimations()

@@ -13,6 +13,7 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private Rigidbody2D _rigidbody;
 
+    private PlayerInput _playerInput;
     private bool _canJump;
     private int _amountOfJumpsLeft;
     private bool _isGrounded;
@@ -20,6 +21,7 @@ public class PlayerJump : MonoBehaviour
     private void Start()
     {
         _amountOfJumpsLeft = _amountOfJumps;
+        _playerInput = new();
     }
 
     void Update()
@@ -36,7 +38,7 @@ public class PlayerJump : MonoBehaviour
 
     private void GetInput()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (_playerInput.GetJumpInput())
             Jump();
     }
 
@@ -63,6 +65,9 @@ public class PlayerJump : MonoBehaviour
             _canJump = false;
         else
             _canJump = true;
+
+        if (_isGrounded == false && _amountOfJumpsLeft == _amountOfJumps)
+            _amountOfJumpsLeft = 1;
     }
 
     private void UpdateAnimations()

@@ -3,8 +3,6 @@ using UnityEngine;
 public class Patrolling : MonoBehaviour
 {
     [SerializeField] private float _speed;
-    [SerializeField] private Rigidbody2D _rigidbody;
-    [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Transform[] _positions;
 
@@ -33,6 +31,6 @@ public class Patrolling : MonoBehaviour
 
     private void Flip()
     {
-         _spriteRenderer.flipX = !_spriteRenderer.flipX;
+        transform.eulerAngles = new Vector3(0f, 180f, 0f);
     }
 }
