@@ -8,7 +8,6 @@ public class EnemyData : ScriptableObject
 	#endregion
 
 	#region EnemyStats
-	[field: SerializeField] public int EnemyMaxHealth { get; private set; } = 100;
 	[field: SerializeField] public float EnemySpeed { get; private set; } = 2.5f;
 	#endregion
 

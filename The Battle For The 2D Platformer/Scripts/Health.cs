@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour, IDamageable, IHealeable
+public class Health : MonoBehaviour, IDamageable, IHealeable
 {
-    [SerializeField] private PlayerData _playerData;
+    [SerializeField] private HealthData _healthData;
 
     private int _currentHealth;
 
     private void Start()
     {
-        _currentHealth = _playerData.MaxHealth;
+        _currentHealth = _healthData.MaxHealth;
     }
 
     public void TakeDamage(int damage)
@@ -23,8 +23,8 @@ public class PlayerStats : MonoBehaviour, IDamageable, IHealeable
     {
         _currentHealth += healValue;
 
-        if( _currentHealth > _playerData.MaxHealth)
-            _currentHealth = _playerData.MaxHealth;
+        if( _currentHealth > _healthData.MaxHealth)
+            _currentHealth = _healthData.MaxHealth;
     }
 
     private void Die()
