@@ -23,8 +23,7 @@ public class Health : MonoBehaviour, IDamageable, IHealeable
     {
         _currentHealth += healValue;
 
-        if( _currentHealth > _healthData.MaxHealth)
-            _currentHealth = _healthData.MaxHealth;
+        Mathf.Clamp(_currentHealth, 0, _healthData.MaxHealth);
     }
 
     private void Die()

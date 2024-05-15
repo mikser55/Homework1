@@ -8,7 +8,7 @@ public class PlayerDetector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.GetComponent<PlayerMover>())
+        if (collision.gameObject.TryGetComponent(out PlayerMover player))
         {
             OnDetected();
         }
@@ -16,7 +16,7 @@ public class PlayerDetector : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.GetComponent<PlayerMover>())
+        if (collision.gameObject.TryGetComponent(out PlayerMover player))
         {
             OnLosted();
         }
