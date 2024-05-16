@@ -1,13 +1,15 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerStats))]
+[RequireComponent(typeof(Health))]
 public class ObjectsDetector : MonoBehaviour
 {
-    private PlayerStats _playerStats;
+    [SerializeField] private KitData _kitData;
+
+    private Health _playerStats;
 
     private void Awake()
     {
-        _playerStats = GetComponent<PlayerStats>();
+        _playerStats = GetComponent<Health>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -20,7 +22,7 @@ public class ObjectsDetector : MonoBehaviour
         else if (collision.gameObject.TryGetComponent(out Kit kit))
         {
             kit.gameObject.SetActive(false);
-            _playerStats.Heal(kit.GetHealNumber());
+            _playerStats.Heal(_kitData._kitHealNumber);
             kit.OnCollected();
         }
     }

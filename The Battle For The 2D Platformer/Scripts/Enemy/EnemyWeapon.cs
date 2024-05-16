@@ -15,7 +15,10 @@ public class EnemyWeapon : MonoBehaviour
         Collider2D detectedCollider = Physics2D.OverlapCircle(currentPosition, _enemyData.EnemyAttackRange, _attackMask);
 
         if (detectedCollider != null)
-            detectedCollider.GetComponent<PlayerStats>().TakeDamage(_enemyData.EnemyDamage);
+        {
+            detectedCollider.TryGetComponent<Health>(out Health stats);
+                stats.TakeDamage(_enemyData.EnemyDamage);
+        }
     }
 
     private void OnDrawGizmosSelected()

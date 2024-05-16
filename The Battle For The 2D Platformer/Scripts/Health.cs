@@ -13,17 +13,15 @@ public class Health : MonoBehaviour, IDamageable, IHealeable
 
     public void TakeDamage(int damage)
     {
-        if (damage >= 0)
-            _currentHealth -= damage;
+        _currentHealth -= damage;
 
         if (_currentHealth <= 0)
-            Die();
+            Die();    
     }
 
     public void Heal(int healValue)
     {
-        if (healValue >= 0))
-            _currentHealth += healValue;
+        _currentHealth += healValue;
 
         Mathf.Clamp(_currentHealth, 0, _healthData.MaxHealth);
     }
