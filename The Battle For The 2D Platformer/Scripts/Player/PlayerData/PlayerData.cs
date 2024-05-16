@@ -35,8 +35,4 @@ public class PlayerData : ScriptableObject
     [field: SerializeField] public float GravityMult { get; private set; } = 2f;
     [field: SerializeField] public float MaxFallSpeed { get; private set; } = 10f;
     #endregion
-
-    #region PlayerHealth
-    [field: SerializeField] public int MaxHealth { get; private set; } = 100;
-    #endregion
 }

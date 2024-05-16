@@ -4,32 +4,33 @@ using UnityEngine;
 public class CoinSpawner : MonoBehaviour
 {
     [SerializeField] private Coin _coin;
-    [SerializeField] private ObjectsData _objectsData;
+    [SerializeField] private CoinData _coinData;
 
     private void OnEnable()
     {
         _coin.CoinCollected += RespawnCoin;
     }
 
-    private void RespawnCoin()
+    private void OnDisable()
     {
-        StartCoroutine(SpawnCoinsCoroutine());
+        _coin.CoinCollected -= RespawnCoin;
+    }
+
+    public CoinData GetData()
+    {
+        return _coinData;
     }
 
     private IEnumerator SpawnCoinsCoroutine()
     {
-        WaitForSeconds wait = new(_objectsData.CoinSpawnTime);
-
-        yield return wait;
+        yield return new WaitForSeconds(_coinData.CoinSpawnTime);
 
         while (_coin.gameObject.activeSelf != true)
-        {
             _coin.gameObject.SetActive(true);
-        }
     }
 
-    private void OnDisable()
+    private void RespawnCoin()
     {
-        _coin.CoinCollected -= RespawnCoin;
+        StartCoroutine(SpawnCoinsCoroutine());
     }
 }
