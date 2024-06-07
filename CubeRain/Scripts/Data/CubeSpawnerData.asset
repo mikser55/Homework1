@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 425384e83ddff7741b271185c903c330, type: 3}
   m_Name: CubeSpawnerData
   m_EditorClassIdentifier: 
-  <SpawnTime>k__BackingField: 1
+  <SpawnTime>k__BackingField: 0.5
   <YSpawnPosition>k__BackingField: 15
