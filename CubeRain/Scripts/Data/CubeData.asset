@@ -9,6 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c519f56b7bfac540a7fd2ed6d4408fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 62089a2ebf3e558498a2542c91e1e79c, type: 3}
   m_Name: CubeData
   m_EditorClassIdentifier: 
+  <MinCubeLiveTime>k__BackingField: 2
+  <MaxCubeLiveTime>k__BackingField: 5
