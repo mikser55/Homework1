@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private CubeData _cubeData;
+    [SerializeField] private CubeData _data;
 
     private ObjectPoolManager _poolManager;
     private Renderer _renderer;
@@ -26,15 +26,6 @@ public class Cube : MonoBehaviour
         }
     }
 
-    private IEnumerator LiveTimeCoroutine()
-    {
-        float liveTime = Random.Range(_cubeData.MinCubeLiveTime, _cubeData.MaxCubeLiveTime);
-        yield return new WaitForSeconds(liveTime);
-
-        _poolManager.ReturnCube(this);
-        StopCoroutine(_liveCoroutine);
-    }
-
     public void TakeObjectPool(ObjectPoolManager pool)
     {
         _poolManager = pool;
@@ -44,5 +35,15 @@ public class Cube : MonoBehaviour
     {
         _isCollided = false;
         _renderer.material.color = color;
+    }
+
+    private IEnumerator LiveTimeCoroutine()
+    {
+        float liveTime = Random.Range(_data.MinCubeLiveTime, _data.MaxCubeLiveTime);
+
+        yield return new WaitForSeconds(liveTime);
+
+        _poolManager.ReturnCube(this);
+        StopCoroutine(_liveCoroutine);
     }
 }

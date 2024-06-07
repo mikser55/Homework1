@@ -3,7 +3,6 @@ using UnityEngine.Pool;
 
 public class ObjectPoolManager : MonoBehaviour
 {
-    [SerializeField] private CubeData _cubeData;
     [SerializeField] private Cube _cubePrefab;
 
     private Color _primalColor = Color.yellow;

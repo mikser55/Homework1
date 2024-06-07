@@ -13,7 +13,7 @@ public class CubeSpawner : MonoBehaviour
 
     private void Awake()
     {
-        _groundMeshRenderer = _ground.GetComponent<MeshRenderer>();
+        _groundMeshRenderer = _ground.GetMeshRenderer();
     }
 
     private void Start()
