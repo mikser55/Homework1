@@ -6,16 +6,15 @@ public class HealthTextChanger : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private HealthData _healthData;
     [SerializeField] private Health _health;
-    [SerializeField] private HealthTracker _healthTracker;
 
     private void OnEnable()
     {
-        _healthTracker.HealthUpdated += ChangeHealthText;
+        _health.HealthUpdated += ChangeHealthText;
     }
 
     private void OnDisable()
     {
-        _healthTracker.HealthUpdated -= ChangeHealthText;
+        _health.HealthUpdated -= ChangeHealthText;
     }
 
     private void Start()

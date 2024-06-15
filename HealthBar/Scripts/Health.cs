@@ -1,45 +1,54 @@
-using Assets.Scripts;
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Health : MonoBehaviour, IDamageable, IHealeable
 {
-    [SerializeField] private HealthData _healthData;
-    [SerializeField] private Slider _healthSlider;
-    [SerializeField] private Slider _damageSlider;
-    [SerializeField] private HealthTracker _healthTracker;
-    [SerializeField] private HealthEffects _healthEffecter;
-    
-    private int _currentHealth;
+    [SerializeField] private HealthData _data;
+    [SerializeField] private HealthUI _healthUI;
+
+    public event Action HealthUpdated;
+    private int _current;
 
     private void Awake()
     {
-        _currentHealth = _healthData.MaxHealth;
+        _current = _data.MaxHealth;
+    }
+
+    private void OnEnable()
+    {
+        HealthUpdated += _healthUI.StartChanges;
+    }
+
+    private void OnDisable()
+    {
+        HealthUpdated -= _healthUI.StartChanges;
     }
 
     public void TakeDamage(int damage)
     {
-        _currentHealth -= damage;
-        _healthEffecter.TakeHealthInfo(_currentHealth);
-        _healthSlider.value = _currentHealth;
+        _current -= damage;
 
-        if (_currentHealth <= 0)
+        if (_current <= 0)
             Die();
 
-        _healthTracker.OnHealthUpdated();
+        OnHealthUpdated();
     }
 
-    public void Heal(int healValue)
+    public void GetHeal(int healValue)
     {
-        _currentHealth += healValue;
-        _currentHealth = Mathf.Clamp(_currentHealth, 0, _healthData.MaxHealth);
-        _healthEffecter.TakeHealthInfo(_currentHealth);
-        _healthTracker.OnHealthUpdated();
+        _current += healValue;
+        _current = Mathf.Clamp(_current, 0, _data.MaxHealth);
+        OnHealthUpdated();
     }
 
     public int GetCurrentHealth()
     {
-        return _currentHealth;
+        return _current;
+    }
+
+    private void OnHealthUpdated()
+    {
+        HealthUpdated?.Invoke();
     }
 
     private void Die()
