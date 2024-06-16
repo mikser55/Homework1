@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -6,29 +7,22 @@ namespace Assets.Scripts
     public class SmoothHealth : MonoBehaviour
     {
         [SerializeField] private HealthData _data;
-        [SerializeField] private HealthUI _healthUI;
 
-        private event Action _healthUpdated;
-        private int _current;
+        private float _current;
+        private float _targetValue;
+        private float _changeSpeed = 10f;
 
-        private void OnEnable()
-        {
-            _healthUpdated += _healthUI.StartChanges;
-        }
-
-        private void OnDisable()
-        {
-            _healthUpdated -= _healthUI.StartChanges;
-        }
+        public event Action HealthUpdated;
 
         private void Start()
         {
             _current = _data.MaxHealth;
+            _targetValue = _current;
         }
 
-        public void TakeDamage(int damage)
+        public void TakeDamage(float damage)
         {
-            _current -= damage;
+            StartCoroutine(DecreaseHealthCoroutine(damage));
 
             if (_current <= 0)
                 Die();
@@ -36,21 +30,45 @@ namespace Assets.Scripts
             OnHealthUpdated();
         }
 
-        public void GetHeal(int healValue)
+        public void GetHeal(float healValue)
         {
-            _current += healValue;
+            StartCoroutine(IncreaseHealthCoroutine(healValue));
             _current = Mathf.Clamp(_current, 0, _data.MaxHealth);
             OnHealthUpdated();
         }
 
-        public int GetCurrentHealth()
+        public float GetCurrentHealth()
         {
             return _current;
         }
 
         public void OnHealthUpdated()
         {
-            _healthUpdated?.Invoke();
+            HealthUpdated?.Invoke();
+        }
+
+        private IEnumerator IncreaseHealthCoroutine(float value)
+        {
+            _targetValue += value;
+            _targetValue = Mathf.Clamp(_targetValue, 0, _data.MaxHealth);
+
+            while (_current != _targetValue)
+            {
+                _current = Mathf.MoveTowards(_current, _targetValue, _changeSpeed * Time.deltaTime);
+                yield return null;
+            }
+        }
+
+        private IEnumerator DecreaseHealthCoroutine(float value)
+        {
+            _targetValue -= value;
+            _targetValue = Mathf.Clamp(_targetValue, 0, _data.MaxHealth);
+
+            while (_current != _targetValue)
+            {
+                _current = Mathf.MoveTowards(_current, _targetValue, _changeSpeed * Time.deltaTime);
+                yield return null;
+            }
         }
 
         private void Die()

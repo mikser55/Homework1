@@ -7,23 +7,35 @@ public class HealthUI : MonoBehaviour
 {
     [SerializeField] private Slider _healthSlider;
     [SerializeField] private Slider _healthSmoothSlider;
+    [SerializeField] private Health _health;
     [SerializeField] private SmoothHealth _smoothHealth;
 
     private float _changeSpeed = 10f;
     private int _current = 0;
 
-    public void StartChanges()
+    private void OnEnable()
     {
-        _current = _smoothHealth.GetCurrentHealth();
-        _healthSlider.value = _current;
-        StartCoroutine(HealthChangeCoroutine(_healthSmoothSlider));
+        _health.HealthUpdated += StartChanges;
+        _smoothHealth.HealthUpdated += StartChanges;
     }
 
-    private IEnumerator HealthChangeCoroutine(Slider slider)
+    private void OnDisable()
+    {
+        _smoothHealth.HealthUpdated -= StartChanges;
+        _health.HealthUpdated -= StartChanges;
+    }
+
+    public void StartChanges()
+    {
+        _healthSlider.value = _health.GetCurrentHealth();
+        StartCoroutine(UIChangeCoroutine(_healthSmoothSlider));
+    }
+
+    private IEnumerator UIChangeCoroutine(Slider slider)
     {
         while (slider.value != _current)
         {
-            slider.value = Mathf.MoveTowards(slider.value, _current, _changeSpeed * Time.deltaTime);
+            slider.value = Mathf.MoveTowards(slider.value, _smoothHealth.GetCurrentHealth(), _changeSpeed * Time.deltaTime);
             yield return null;
         }
     }

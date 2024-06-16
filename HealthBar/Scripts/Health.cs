@@ -4,27 +4,17 @@ using UnityEngine;
 public class Health : MonoBehaviour, IDamageable, IHealeable
 {
     [SerializeField] private HealthData _data;
-    [SerializeField] private HealthUI _healthUI;
+
+    private float _current;
 
     public event Action HealthUpdated;
-    private int _current;
 
     private void Awake()
     {
         _current = _data.MaxHealth;
     }
 
-    private void OnEnable()
-    {
-        HealthUpdated += _healthUI.StartChanges;
-    }
-
-    private void OnDisable()
-    {
-        HealthUpdated -= _healthUI.StartChanges;
-    }
-
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         _current -= damage;
 
@@ -34,14 +24,14 @@ public class Health : MonoBehaviour, IDamageable, IHealeable
         OnHealthUpdated();
     }
 
-    public void GetHeal(int healValue)
+    public void GetHeal(float healValue)
     {
         _current += healValue;
         _current = Mathf.Clamp(_current, 0, _data.MaxHealth);
         OnHealthUpdated();
     }
 
-    public int GetCurrentHealth()
+    public float GetCurrentHealth()
     {
         return _current;
     }

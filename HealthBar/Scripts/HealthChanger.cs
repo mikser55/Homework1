@@ -6,8 +6,8 @@ public class HealthChanger : MonoBehaviour
     [SerializeField] private Health _playerHealth;
     [SerializeField] private SmoothHealth _playerSmoothHealth;
 
-    private int _damage = 10;
-    private int _healValue = 10;
+    private float _damage = 10;
+    private float _healValue = 10;
 
     public void DoDamage()
     {
