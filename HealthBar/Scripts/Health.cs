@@ -5,35 +5,37 @@ public class Health : MonoBehaviour, IDamageable, IHealeable
 {
     [SerializeField] private HealthData _data;
 
-    private float _current;
+    public float Current { get; private set; }
 
     public event Action HealthUpdated;
 
     private void Awake()
     {
-        _current = _data.MaxHealth;
+        Current = _data.MaxHealth;
     }
 
     public void TakeDamage(float damage)
     {
-        _current -= damage;
+        if (damage > 0)
+        {
+            Current -= damage;
+            Current = Mathf.Clamp(Current, 0, _data.MaxHealth);
 
-        if (_current <= 0)
-            Die();
+            if (Current == 0)
+                Die();
 
-        OnHealthUpdated();
+            OnHealthUpdated();
+        }
     }
 
-    public void GetHeal(float healValue)
+    public void TakeHeal(float healValue)
     {
-        _current += healValue;
-        _current = Mathf.Clamp(_current, 0, _data.MaxHealth);
-        OnHealthUpdated();
-    }
-
-    public float GetCurrentHealth()
-    {
-        return _current;
+        if (healValue > 0)
+        {
+            Current += healValue;
+            Current = Mathf.Clamp(Current, 0, _data.MaxHealth);
+            OnHealthUpdated(); 
+        }
     }
 
     private void OnHealthUpdated()

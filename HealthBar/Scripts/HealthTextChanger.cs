@@ -24,6 +24,6 @@ public class HealthTextChanger : MonoBehaviour
 
     private void ChangeHealthText()
     {
-        _healthText.text = $"Health: {_health.GetCurrentHealth()}/{_healthData.MaxHealth}";
+        _healthText.text = $"Health: {_health.Current}/{_healthData.MaxHealth}";
     }
 }
