@@ -7,6 +7,7 @@ public class LifeDrainAbility : MonoBehaviour
     [SerializeField] private float _radius = 3f;
     [SerializeField] private float _delay = 1f;
     [SerializeField] private float _maxDuration = 6f;
+    [SerializeField] private Health _playerHealth;
 
     private PlayerInput _inputs;
     private float _currentDuration;
@@ -53,6 +54,7 @@ public class LifeDrainAbility : MonoBehaviour
             {
                 _closestEnemy.TryGetComponent(out Health health);
                 health?.TakeDamage(_damage);
+                _playerHealth.TakeHeal(_damage);
             }
 
             if (_currentDuration == 0)
