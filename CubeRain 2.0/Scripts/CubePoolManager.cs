@@ -5,16 +5,6 @@ public class CubePoolManager : PoolManager<Cube>
     [SerializeField] private BombSpawner _bombSpawner;
 
     private Color _primalColor = Color.yellow;
-    
-    public Cube GetCube()
-    {
-        return Pool.Get();
-    }
-
-    public void ReturnCube(Cube cube)
-    {
-        Pool.Release(cube);
-    }
 
     public int GetNumberActiveObjects()
     {

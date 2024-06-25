@@ -6,13 +6,13 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Renderer))]
 public class Bomb : MonoBehaviour
 {
-    public event Action BombExploded;
-
     private float _targetAlpha = 0f;
     private float _maxAlpha = 1f;
     private float _currentAlpha = 1f;
     private Renderer _renderer;
     private BombPoolManager _poolManager;
+
+    public event Action BombExploded;
 
     private void Awake()
     {
@@ -29,11 +29,6 @@ public class Bomb : MonoBehaviour
     public void TakeObjectPool(BombPoolManager poolManager)
     {
         _poolManager = poolManager;
-    }
-
-    private void OnBombExploded()
-    {
-        BombExploded?.Invoke();
     }
 
     private void SetTransparency(float value)
@@ -56,7 +51,7 @@ public class Bomb : MonoBehaviour
             yield return null;
         }
 
-        OnBombExploded();
-        _poolManager.ReturnBomb(this);
+        BombExploded?.Invoke();
+        _poolManager.ReturnObject(this);
     }
 }

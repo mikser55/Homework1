@@ -17,6 +17,16 @@ public abstract class PoolManager<T> : MonoBehaviour where T : MonoBehaviour
         Pool = new ObjectPool<T>(CreatePooledItem, OnTakeFromPool, OnReturnToPool, OnDestroyPoolObject);
     }
 
+    public T GetObject()
+    {
+        return Pool.Get();
+    }
+
+    public void ReturnObject(T obj)
+    {
+        Pool.Release(obj);
+    }
+
     protected abstract T CreatePooledItem();
 
     protected virtual void OnDestroyPoolObject(T instance)

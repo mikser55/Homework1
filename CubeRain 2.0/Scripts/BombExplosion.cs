@@ -35,10 +35,12 @@ public class BombExplosion : MonoBehaviour
             {
                 hit.TryGetComponent(out Rigidbody rigidbody);
 
-                float distance = Vector3.Distance(bombPosition, hit.transform.position);
-                float force = _explosionForce * (1f - (distance / _explosionRadius));
-
-                rigidbody?.AddExplosionForce(force, bombPosition, _explosionRadius, upwardsModifier, ForceMode.Impulse);
+                if (rigidbody != null)
+                {
+                    float distance = Vector3.Distance(bombPosition, hit.transform.position);
+                    float force = _explosionForce * (1f - (distance / _explosionRadius));
+                    rigidbody.AddExplosionForce(force, bombPosition, _explosionRadius, upwardsModifier, ForceMode.Impulse);
+                }
             }
         }
     }

@@ -45,7 +45,7 @@ public class Cube : MonoBehaviour
 
         yield return new WaitForSeconds(liveTime);
 
-        _poolManager.ReturnCube(this);
+        _poolManager.ReturnObject(this);
         StopCoroutine(_liveCoroutine);
     }
 }

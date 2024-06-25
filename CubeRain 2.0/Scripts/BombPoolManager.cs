@@ -1,15 +1,5 @@
 public class BombPoolManager : PoolManager<Bomb>
 {
-    public Bomb GetBomb()
-    {
-        return Pool.Get();
-    }
-
-    public void ReturnBomb(Bomb bomb)
-    {
-        Pool.Release(bomb);
-    }
-
     public int GetNumberActiveObjects()
     {
         return Pool.CountActive;

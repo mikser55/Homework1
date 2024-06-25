@@ -36,7 +36,7 @@ public class CubeSpawner : MonoBehaviour
         {
             Vector3 spawnPosition = GetRandomPositionAbovePlane();
             yield return wait;
-            Cube newCube = _poolManager.GetCube();
+            Cube newCube = _poolManager.GetObject();
             newCube.transform.position = spawnPosition;
         }
     }
