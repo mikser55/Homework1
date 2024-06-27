@@ -12,7 +12,7 @@ public class Bomb : MonoBehaviour
     private Renderer _renderer;
     private BombPoolManager _poolManager;
 
-    public event Action BombExploded;
+    public event Action ObjectExploded;
 
     private void Awake()
     {
@@ -51,7 +51,7 @@ public class Bomb : MonoBehaviour
             yield return null;
         }
 
-        BombExploded?.Invoke();
+        ObjectExploded?.Invoke();
         _poolManager.ReturnObject(this);
     }
 }

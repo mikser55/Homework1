@@ -6,16 +6,6 @@ public class CubePoolManager : PoolManager<Cube>
 
     private Color _primalColor = Color.yellow;
 
-    public int GetNumberActiveObjects()
-    {
-        return Pool.CountActive;
-    }
-
-    protected override void OnDestroyPoolObject(Cube cube)
-    {
-        base.OnDestroyPoolObject(cube);
-    }
-
     protected override void OnReturnToPool(Cube cube)
     {
         base.OnReturnToPool(cube);
@@ -30,7 +20,7 @@ public class CubePoolManager : PoolManager<Cube>
 
     protected override Cube CreatePooledItem()
     {
-        Cube cube = Instantiate(Prefab);
+        Cube cube = base.CreatePooledItem();
         cube.TakeObjectPool(this);
         cube.gameObject.SetActive(false);
         OnCountChanged();

@@ -14,12 +14,12 @@ public class BombExplosion : MonoBehaviour
 
     private void OnEnable()
     {
-        _bomb.BombExploded += Explode;
+        _bomb.ObjectExploded += Explode;
     }
 
     private void OnDisable()
     {
-        _bomb.BombExploded -= Explode;
+        _bomb.ObjectExploded -= Explode;
     }
 
     private void Explode()

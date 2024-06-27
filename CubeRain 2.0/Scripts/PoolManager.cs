@@ -4,32 +4,40 @@ using UnityEngine.Pool;
 
 public abstract class PoolManager<T> : MonoBehaviour where T : MonoBehaviour
 {
+    [SerializeField] private T _prefab;
+
+    private ObjectPool<T> _pool;
+
     public event Action ObjectsCountChanged;
 
-    [SerializeField] protected T Prefab;
+    public int AllCreatedObjects { get; private set; } = 0;
 
-    protected ObjectPool<T> Pool;
-
-    public int AllCreatedObjects { get; protected set; } = 0;
-
-    protected void Awake()
+    private void Awake()
     {
-        Pool = new ObjectPool<T>(CreatePooledItem, OnTakeFromPool, OnReturnToPool, OnDestroyPoolObject);
+        _pool = InitializePool();
+    }
+
+    public int GetNumberActiveObjects()
+    {
+        return _pool.CountActive;
     }
 
     public T GetObject()
     {
-        return Pool.Get();
+        return _pool.Get();
     }
 
     public void ReturnObject(T obj)
     {
-        Pool.Release(obj);
+        _pool.Release(obj);
     }
 
-    protected abstract T CreatePooledItem();
+    protected virtual T CreatePooledItem()
+    {
+         return Instantiate(_prefab);
+    }
 
-    protected virtual void OnDestroyPoolObject(T instance)
+    protected void OnDestroyPoolObject(T instance)
     {
         Destroy(instance.gameObject);
     }
@@ -49,5 +57,10 @@ public abstract class PoolManager<T> : MonoBehaviour where T : MonoBehaviour
     protected void OnCountChanged()
     {
         ObjectsCountChanged?.Invoke();
+    }
+
+    private ObjectPool<T> InitializePool()
+    {
+        return new ObjectPool<T>(CreatePooledItem, OnTakeFromPool, OnReturnToPool, OnDestroyPoolObject);
     }
 }
