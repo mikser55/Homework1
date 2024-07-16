@@ -4,10 +4,8 @@ using UnityEngine.UI;
 
 public class ChangeText : MonoBehaviour
 {
-    [SerializeField] Text _text1;
-    [SerializeField] Text _text2;
-    [SerializeField] Text _text3;
-    [SerializeField] private float _duration;
+    [SerializeField] DoData _data;
+    [SerializeField] Text _text;
     [SerializeField] string _newText1 = "Мы заменили тут текст";
     [SerializeField] string _newText2 = ". Мы дополнили тут текст этим сообщением";
     [SerializeField] string _newText3 = "Мы взломали тут текст";
@@ -15,8 +13,11 @@ public class ChangeText : MonoBehaviour
 
     private void Start()
     {
-        _text1.DOText(_newText1, _duration);
-        _text2.DOText(_newText2, _duration).SetRelative();
-        _text3.DOText(_newText3, _duration, true, ScrambleMode.All);
+        DOTween.Sequence()
+        .Append(_text.DOText(_newText1, _data.Duration))
+        .AppendInterval(_data.Delay)
+        .Append(_text.DOText(_newText2, _data.Duration).SetRelative())
+        .AppendInterval(_data.Delay)
+        .Append(_text.DOText(_newText3, _data.Duration, true, ScrambleMode.All));
     }
 }

@@ -5,7 +5,7 @@ public class Scaler : MonoBehaviour
 {
     [SerializeField] private float _scaleDuration = 1f;
     [SerializeField] private float _scaleCofficient = 5f;
-    [SerializeField] private LoopType _loopType;
+    [SerializeField] DoData _data;
 
     private void Start()
     {
@@ -16,6 +16,6 @@ public class Scaler : MonoBehaviour
     {
         DOTween.Sequence()
             .Append(transform.DOScale(_scaleCofficient, _scaleDuration))
-            .SetLoops(-1, _loopType);
+            .SetLoops(-1, _data.LoopType);
     }
 }

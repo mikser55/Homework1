@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class Mover : MonoBehaviour
 {
-    [SerializeField] private LoopType _loopType;
-    [SerializeField] private float _moveDuration = 1f;
+    [SerializeField] DoData _data;
     [SerializeField] private float _zDistance = 10f;
 
     private void Start()
@@ -15,7 +14,7 @@ public class Mover : MonoBehaviour
     private void Move()
     {
         DOTween.Sequence()
-            .Append(transform.DOMove(new Vector3(transform.position.x, transform.position.y, transform.position.z + _zDistance), _moveDuration))
-            .SetLoops(-1, _loopType);
+            .Append(transform.DOMove(new Vector3(transform.position.x, transform.position.y, transform.position.z + _zDistance), _data.Duration))
+            .SetLoops(-1, _data.LoopType);
     }
 }
