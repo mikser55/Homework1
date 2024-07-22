@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.UI;
 
 [RequireComponent(typeof(Bot))]
 public class BotMover : MonoBehaviour
@@ -9,6 +10,7 @@ public class BotMover : MonoBehaviour
     [SerializeField] private float _arriveDistance;
     [SerializeField] private List<BasePoint> _basePoints;
     [SerializeField] private Transform _collectPoint;
+    [SerializeField] private float _rotationSpeed;
 
     private Bot _bot;
     private Transform _botTransform;
@@ -51,6 +53,7 @@ public class BotMover : MonoBehaviour
             while ((_target.position - _botTransform.position).sqrMagnitude > _sqrArriveDistance)
             {
                 _botTransform.position = Vector3.MoveTowards(_botTransform.position, _target.position, _speed * Time.deltaTime);
+                ChangeRotation();
                 yield return null;
             }
 
@@ -105,5 +108,12 @@ public class BotMover : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ChangeRotation()
+    {
+        Vector3 direction = (_target.position - _botTransform.position).normalized;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        _botTransform.rotation = Quaternion.Slerp(_botTransform.rotation, rotation, _rotationSpeed * Time.deltaTime);
     }
 }
