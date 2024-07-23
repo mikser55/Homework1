@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Base : MonoBehaviour
 {
+    private const bool IsFree = true;
+
     [SerializeField] Sensor _sensor;
     [SerializeField] private List<Bot> _bots;
     [SerializeField] private ResourcePool _pool;
+    [SerializeField] private List<BasePoint> _basePoints;
+
+    private Dictionary<Resource, bool> _resources = new();
+    private Dictionary<BasePoint, bool> _points = new();
 
     public event Action ResourceChanged;
 
@@ -23,6 +28,14 @@ public class Base : MonoBehaviour
     {
         _sensor.ResourseFinded -= OrderToCollect;
         _pool.ResourceCollected -= IncreaseResourcesAmount;
+    }
+
+    private void Awake()
+    {
+        foreach (BasePoint point in _basePoints)
+        {
+            _points.Add(point, IsFree);
+        }
     }
 
     private void OrderToCollect()
@@ -49,13 +62,13 @@ public class Base : MonoBehaviour
 
     private Transform GetRandomResource()
     {
-        Resource resource = _sensor.Resources[Random.Range(0, _sensor.Resources.Count)];
-
-        if (resource.IsCollecting == false)
+        foreach (var obj in _resources)
         {
-            resource.ReserveResource();
-
-            return resource.transform;
+            if (obj.Value == false)
+            {
+                _resources[obj.Key] = true;
+                return obj.Key.transform;
+            }
         }
 
         return null;
@@ -65,5 +78,43 @@ public class Base : MonoBehaviour
     {
         ResourcesAmount++;
         ResourceChanged?.Invoke();
+    }
+
+    public void DeleteCollectedResource(Resource resource)
+    {
+        _resources.Remove(resource);
+    }
+
+    public void FillResources(Dictionary<Resource, bool> resources)
+    {
+        foreach (var obj in resources)
+        {
+            if (!_resources.ContainsKey(obj.Key))
+                _resources.Add(obj.Key, obj.Value);
+        }
+    }
+
+    public BasePoint GetFreePoint()
+    {
+        foreach (var obj in _points)
+        {
+            if (obj.Value)
+            {
+                _points[obj.Key] = false;
+                return obj.Key;
+            }
+        }
+
+        return null;
+    }
+
+    public void SetFreeBasePoint(BasePoint point)
+    {
+        _points[point] = true;
+    }
+
+    public void ReserveBasePoint(BasePoint point)
+    {
+        _points[point] = false;
     }
 }

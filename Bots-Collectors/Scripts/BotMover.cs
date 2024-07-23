@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.UI;
 
 [RequireComponent(typeof(Bot))]
 public class BotMover : MonoBehaviour
@@ -11,6 +10,7 @@ public class BotMover : MonoBehaviour
     [SerializeField] private List<BasePoint> _basePoints;
     [SerializeField] private Transform _collectPoint;
     [SerializeField] private float _rotationSpeed;
+    [SerializeField] private Base _base;
 
     private Bot _bot;
     private Transform _botTransform;
@@ -41,7 +41,7 @@ public class BotMover : MonoBehaviour
         _bot.TakeCurrentResource(resourсe);
         _bot.SetBusy();
         _isForCollecting = true;
-        _currentBasePoint.SetFree();
+        _base.SetFreeBasePoint(_currentBasePoint);
         _currentBasePoint = null;
         StartCoroutine();
     }
@@ -95,19 +95,8 @@ public class BotMover : MonoBehaviour
 
     private void FindFreePoint()
     {
-        if (_basePoints.Count > 0)
-        {
-            foreach (var basePoint in _basePoints)
-            {
-                if (basePoint.IsFree)
-                {
-                    _target = basePoint.transform;
-                    basePoint.ReservePoint();
-                    _currentBasePoint = basePoint;
-                    return;
-                }
-            }
-        }
+        _currentBasePoint = _base.GetFreePoint();
+        _target = _currentBasePoint.transform;
     }
 
     private void ChangeRotation()

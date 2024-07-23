@@ -12,7 +12,7 @@ public class ResourcePool : MonoBehaviour
 
     private void Awake()
     {
-        _pool = new(CreateObject, ActionOnGet, ActionOnRelease, ActionOnDestroy);
+        _pool = new(CreateResource, OnGet, OnRelease, OnDestroyResource);
     }
 
     public Resource GetResource()
@@ -25,24 +25,23 @@ public class ResourcePool : MonoBehaviour
         _pool.Release(resource);
     }
 
-    private void ActionOnDestroy(Resource resource)
+    private void OnDestroyResource(Resource resource)
     {
         Destroy(resource);
     }
 
-    private void ActionOnRelease(Resource resource)
+    private void OnRelease(Resource resource)
     {
         ResourceCollected?.Invoke();
         resource.gameObject.SetActive(false);
     }
 
-    private void ActionOnGet(Resource resource)
+    private void OnGet(Resource resource)
     {
         resource.gameObject.SetActive(true);
-        resource.Init();
     }
 
-    private Resource CreateObject()
+    private Resource CreateResource()
     {
         return Instantiate(_prefab);
     }

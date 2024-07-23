@@ -4,6 +4,7 @@ using UnityEngine;
 public class Bot : MonoBehaviour
 {
     [SerializeField] private ResourcePool _resourceSpawner;
+    [SerializeField] private Base _base;
 
     private BotMover _mover;
     private Transform _botTransform;
@@ -26,7 +27,10 @@ public class Bot : MonoBehaviour
         _currentResource.TryGetComponent(out Resource resource);
 
         if (resource != null)
+        {
             _resourceSpawner.ReleaseResource(resource);
+            _base.DeleteCollectedResource(resource);
+        }
     }
 
     public void SetBusy()
