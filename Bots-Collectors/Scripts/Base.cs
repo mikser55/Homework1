@@ -50,9 +50,7 @@ public class Base : MonoBehaviour
 
                     if (randomResource != null)
                     {
-                        bot.TryGetComponent(out BotMover botMover);
-
-                        if (botMover != null)
+                        if (bot.TryGetComponent(out BotMover botMover))
                             botMover.MoveToResource(randomResource);
                     }
                 }

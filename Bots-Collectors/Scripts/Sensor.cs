@@ -8,6 +8,7 @@ public class Sensor : MonoBehaviour
     [SerializeField] private float _radius;
     [SerializeField] private float _delay;
     [SerializeField] private Base _base;
+    [SerializeField] private LayerMask _layerMask;
 
     private WaitForSeconds _wait;
 
@@ -23,7 +24,7 @@ public class Sensor : MonoBehaviour
     {
         Dictionary<Resource, bool> resources = new();
 
-        Collider[] nearObjects = Physics.OverlapSphere(transform.position, _radius);
+        Collider[] nearObjects = Physics.OverlapSphere(transform.position, _radius, _layerMask);
 
         foreach (var obj in nearObjects)
         {
