@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
@@ -75,14 +76,11 @@ public class CameraController : MonoBehaviour
     private void SetStartMousePosition()
     {
         Ray ray = _camera.ScreenPointToRay(_mousePosition);
+        Mouse mouse = Mouse.current;
 
-        if (Input.GetMouseButtonDown(MiddleMouseButton))
-        {
+        if (mouse.middleButton.wasPressedThisFrame)
             if (_plane.Raycast(ray, out float entry))
-            {
                 _dragStartPosition = ray.GetPoint(entry);
-            }
-        }
     }
 
     private void OnMiddleButtonHold()

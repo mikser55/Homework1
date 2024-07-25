@@ -1,14 +1,16 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(BotMover))]
 public class Bot : MonoBehaviour
 {
-    [SerializeField] private ResourcePool _resourceSpawner;
-    [SerializeField] private Base _base;
-
     private BotMover _mover;
     private Transform _botTransform;
     private Transform _currentResource;
+
+    public event Action<Resource> ResourceArrived;
+    public event Action<BasePoint> Arrived;
+    public event Action<BasePoint> Left;
 
     public bool IsCarryingResource { get; private set; }
     public bool IsBusy { get; private set; }
@@ -19,26 +21,41 @@ public class Bot : MonoBehaviour
         _botTransform = transform;
     }
 
-    public void DropResourse()
+    private void OnEnable()
+    {
+        _mover.BotMoveStarted += SetBusy;
+        _mover.ToResourceArrived += CollectResourse;
+        _mover.ToBaseArrived += DropResourse;
+    }
+
+    private void OnDisable()
+    {
+        _mover.BotMoveStarted -= SetBusy;
+        _mover.ToResourceArrived -= CollectResourse;
+        _mover.ToBaseArrived -= DropResourse;
+    }
+
+    public void OnLeft(BasePoint point)
+    {
+        Left?.Invoke(point);
+    }
+
+    public void OnArrived(BasePoint point)
+    {
+        Arrived?.Invoke(point);
+    }
+
+    private void DropResourse()
     {
         _currentResource.transform.SetParent(null);
         IsBusy = false;
         IsCarryingResource = false;
-        _currentResource.TryGetComponent(out Resource resource);
 
-        if (resource != null)
-        {
-            _resourceSpawner.ReleaseResource(resource);
-            _base.DeleteCollectedResource(resource);
-        }
+        if (_currentResource.TryGetComponent(out Resource resource))
+            ResourceArrived?.Invoke(resource);
     }
 
-    public void SetBusy()
-    {
-        IsBusy = true;
-    }
-
-    public void CollectResourse(Transform target)
+    private void CollectResourse(Transform target)
     {
         target.transform.SetParent(_botTransform);
         IsCarryingResource = true;
@@ -48,5 +65,10 @@ public class Bot : MonoBehaviour
     public void TakeCurrentResource(Transform resource)
     {
         _currentResource = resource;
+    }
+
+    private void SetBusy()
+    {
+        IsBusy = true;
     }
 }

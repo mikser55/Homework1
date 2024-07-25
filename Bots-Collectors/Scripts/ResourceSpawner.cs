@@ -19,6 +19,11 @@ public class ResourceSpawner : MonoBehaviour
         
     }
 
+    public void ReleaseResource(Resource resource)
+    {
+        _pool.ReleaseResource(resource);
+    }
+
     private IEnumerator SpawnCoroutine()
     {
         while (enabled)

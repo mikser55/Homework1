@@ -7,12 +7,11 @@ public class Sensor : MonoBehaviour
 {
     [SerializeField] private float _radius;
     [SerializeField] private float _delay;
-    [SerializeField] private Base _base;
     [SerializeField] private LayerMask _layerMask;
 
     private WaitForSeconds _wait;
 
-    public event Action ResourseFinded;
+    public event Action<Dictionary<Resource,bool>> FillingStarted;
 
     private void Start()
     {
@@ -31,10 +30,7 @@ public class Sensor : MonoBehaviour
             obj.TryGetComponent(out Resource resource);
 
             if (resource != null)
-            {
                 resources.Add(resource, false);
-                ResourseFinded?.Invoke();
-            }
         }
 
         return resources;
@@ -44,7 +40,7 @@ public class Sensor : MonoBehaviour
     {
         while (enabled)
         {
-            _base.FillResources(FindResourses());
+            FillingStarted?.Invoke(FindResourses());
             yield return _wait;
         }
     }

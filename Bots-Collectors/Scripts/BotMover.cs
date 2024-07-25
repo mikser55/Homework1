@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +22,10 @@ public class BotMover : MonoBehaviour
     private float _sqrArriveDistance;
 
     private bool _isForCollecting;
-    private bool _isCarryingResource;
+
+    public event Action BotMoveStarted;
+    public event Action ToBaseArrived;
+    public event Action<Transform> ToResourceArrived;
 
     private void Awake()
     {
@@ -39,11 +43,11 @@ public class BotMover : MonoBehaviour
     {
         _target = resourсe;
         _bot.TakeCurrentResource(resourсe);
-        _bot.SetBusy();
+        BotMoveStarted?.Invoke();
         _isForCollecting = true;
-        _base.SetFreeBasePoint(_currentBasePoint);
+        _bot.OnLeft(_currentBasePoint);
         _currentBasePoint = null;
-        StartCoroutine();
+        StartMove();
     }
 
     private IEnumerator MoveCoroutine()
@@ -58,10 +62,12 @@ public class BotMover : MonoBehaviour
             }
 
             if (_isForCollecting)
-                _bot.CollectResourse(_target);
+            {
+                ToResourceArrived?.Invoke(_target);
+            }
             else if (_isForCollecting == false && _bot.IsCarryingResource)
             {
-                _bot.DropResourse();
+                ToBaseArrived?.Invoke();
                 MoveToBase();
             }
         }
@@ -70,27 +76,22 @@ public class BotMover : MonoBehaviour
     private void MoveToBase()
     {
         FindFreePoint();
-        StartCoroutine();
+        StartMove();
     }
 
     public void MoveToCollectPoint()
     {
         _target = _collectPoint;
         _isForCollecting = false;
-        StartCoroutine();
+        StartMove();
     }
 
-    private void StartCoroutine()
+    private void StartMove()
     {
         if (_currentCoroutine != null)
-        {
             StopCoroutine(_currentCoroutine);
-            _currentCoroutine = StartCoroutine(MoveCoroutine());
-        }
-        else
-        {
-            _currentCoroutine = StartCoroutine(MoveCoroutine());
-        }
+
+        _currentCoroutine = StartCoroutine(MoveCoroutine());
     }
 
     private void FindFreePoint()

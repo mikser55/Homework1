@@ -10,12 +10,12 @@ public class UI : MonoBehaviour
 
     private void OnEnable()
     {
-        _base.ResourceChanged += ChangeResourcesAmount;
+        _base.ResourceAmountChanged += ChangeResourcesAmount;
     }
 
     private void OnDisable()
     {
-        _base.ResourceChanged -= ChangeResourcesAmount;
+        _base.ResourceAmountChanged -= ChangeResourcesAmount;
     }
 
     private void Start()

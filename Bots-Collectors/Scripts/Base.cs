@@ -4,37 +4,35 @@ using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-    private const bool IsFree = true;
+    private const bool BasePointIsFree = true;
 
-    [SerializeField] Sensor _sensor;
+    [SerializeField] private Sensor _sensor;
     [SerializeField] private List<Bot> _bots;
-    [SerializeField] private ResourcePool _pool;
+    [SerializeField] private ResourceSpawner _resourcesSpawner;
     [SerializeField] private List<BasePoint> _basePoints;
 
-    private Dictionary<Resource, bool> _resources = new();
-    private Dictionary<BasePoint, bool> _points = new();
+    private readonly Dictionary<Resource, bool> _resources = new();
+    private readonly Dictionary<BasePoint, bool> _points = new();
 
-    public event Action ResourceChanged;
+    public event Action ResourceAmountChanged;
 
     public int ResourcesAmount { get; private set; }
 
     private void OnEnable()
     {
-        _sensor.ResourseFinded += OrderToCollect;
-        _pool.ResourceCollected += IncreaseResourcesAmount;
+        Subscribe();
     }
 
     private void OnDisable()
     {
-        _sensor.ResourseFinded -= OrderToCollect;
-        _pool.ResourceCollected -= IncreaseResourcesAmount;
+        Unsubscribe();
     }
 
     private void Awake()
     {
         foreach (BasePoint point in _basePoints)
         {
-            _points.Add(point, IsFree);
+            _points.Add(point, BasePointIsFree);
         }
     }
 
@@ -46,7 +44,7 @@ public class Base : MonoBehaviour
             {
                 if (bot.IsBusy == false)
                 {
-                    Transform randomResource = GetRandomResource();
+                    Transform randomResource = GetResource();
 
                     if (randomResource != null)
                     {
@@ -55,10 +53,10 @@ public class Base : MonoBehaviour
                     }
                 }
             }
-        }
     }
+}
 
-    private Transform GetRandomResource()
+    private Transform GetResource()
     {
         foreach (var obj in _resources)
         {
@@ -75,21 +73,25 @@ public class Base : MonoBehaviour
     private void IncreaseResourcesAmount()
     {
         ResourcesAmount++;
-        ResourceChanged?.Invoke();
+        ResourceAmountChanged?.Invoke();
     }
 
-    public void DeleteCollectedResource(Resource resource)
+    private void DeleteCollectedResource(Resource resource)
     {
         _resources.Remove(resource);
+        IncreaseResourcesAmount();
+        _resourcesSpawner.ReleaseResource(resource);
     }
 
-    public void FillResources(Dictionary<Resource, bool> resources)
+    private void FillResources(Dictionary<Resource, bool> resources)
     {
         foreach (var obj in resources)
         {
             if (!_resources.ContainsKey(obj.Key))
                 _resources.Add(obj.Key, obj.Value);
         }
+
+        OrderToCollect();
     }
 
     public BasePoint GetFreePoint()
@@ -106,13 +108,37 @@ public class Base : MonoBehaviour
         return null;
     }
 
-    public void SetFreeBasePoint(BasePoint point)
+    private void SetFreeBasePoint(BasePoint point)
     {
         _points[point] = true;
     }
 
-    public void ReserveBasePoint(BasePoint point)
+    private void ReserveBasePoint(BasePoint point)
     {
         _points[point] = false;
+    }
+
+    private void Subscribe()
+    {
+        foreach (Bot bot in _bots)
+        {
+            bot.ResourceArrived += DeleteCollectedResource;
+            bot.Arrived += ReserveBasePoint;
+            bot.Left += SetFreeBasePoint;
+        }
+
+        _sensor.FillingStarted += FillResources;
+    }
+
+    private void Unsubscribe()
+    {
+        foreach (Bot bot in _bots)
+        {
+            bot.ResourceArrived -= DeleteCollectedResource;
+            bot.Arrived -= ReserveBasePoint;
+            bot.Left -= SetFreeBasePoint;
+        }
+
+        _sensor.FillingStarted -= FillResources;
     }
 }

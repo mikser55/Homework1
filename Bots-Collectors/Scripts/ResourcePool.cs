@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Pool;
 
 public class ResourcePool : MonoBehaviour
@@ -7,8 +6,6 @@ public class ResourcePool : MonoBehaviour
     [SerializeField] private Resource _prefab;
 
     private ObjectPool<Resource> _pool;
-
-    public event Action ResourceCollected;
 
     private void Awake()
     {
@@ -32,7 +29,6 @@ public class ResourcePool : MonoBehaviour
 
     private void OnRelease(Resource resource)
     {
-        ResourceCollected?.Invoke();
         resource.gameObject.SetActive(false);
     }
 
