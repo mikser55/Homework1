@@ -11,7 +11,6 @@ public class ResourceSpawner : MonoBehaviour
     [SerializeField] private float _spawnAreaSize;
     [SerializeField] private float _delay;
     [SerializeField] private float _spawnHeight;
-    [SerializeField] private GameManager _gameManager;
 
     private WaitForSeconds _wait;
 
@@ -33,7 +32,6 @@ public class ResourceSpawner : MonoBehaviour
         while (enabled)
         {
             Resource resource = _pool.GetResource();
-            _gameManager.AddResource(resource);
             resource.ReleaseWaiting += ReleaseResource;
             resource.transform.position = GetSpawnPosition();
             yield return _wait;

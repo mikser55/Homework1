@@ -9,11 +9,8 @@ public class Base : MonoBehaviour
 {
     private const int NewBaseCost = 5;
 
-    [SerializeField] private Canvas _buildMenu;
-
     private Transform _currentFlag;
-    private Renderer _renderer;
-    private BaseInteractor _interactor;
+    private BaseColorChanger _colorChanger;
     private BaseFlagger _flagger;
     private Scanner _scanner;
     private BotSpawner _botSpawner;
@@ -33,7 +30,7 @@ public class Base : MonoBehaviour
 
     private void Awake()
     {
-        _renderer = GetComponent<Renderer>();
+        _colorChanger = GetComponent<BaseColorChanger>();
         _scanner = GetComponentInChildren<Scanner>();
         _botSpawner = GetComponent<BotSpawner>();
         _flagger = GetComponent<BaseFlagger>();
@@ -49,17 +46,6 @@ public class Base : MonoBehaviour
         Unsubscribe();
     }
 
-    private void Start()
-    {
-        _renderer.material.color = OriginalColor;
-    }
-
-    [Inject]
-    private void Constructor(BaseInteractor interactor)
-    {
-        _interactor = interactor;
-    }
-
     public int GetBotsCount()
     {
         return _bots.Count;
@@ -67,12 +53,11 @@ public class Base : MonoBehaviour
 
     public void OrderToCollect(Bot bot, Transform resourceInstance)
     {
-        Transform resource = resourceInstance;
-
-        if (resource != null)
+        if (resourceInstance != null && !bot.IsReserved)
         {
             if (bot.TryGetComponent(out BotMover botMover))
-                botMover.MoveToResource(resource);
+                botMover.MoveToResource(resourceInstance);
+
         }
         else
         {
@@ -84,27 +69,6 @@ public class Base : MonoBehaviour
     }
 
     public class Factory : PlaceholderFactory<Base> { }
-
-    private void ChangeBaseSelect(Base selectedBase, Color color, bool isActive, bool isSelected)
-    {
-        if (selectedBase == this)
-        {
-            _renderer.material.color = color;
-            _buildMenu.gameObject.SetActive(isActive);
-            IsSelected = isSelected;
-        }
-        else
-        {
-            ResetSelect();
-        }
-    }
-
-    private void ResetSelect()
-    {
-        _renderer.material.color = OriginalColor;
-        _buildMenu.gameObject.SetActive(false);
-        IsSelected = false;
-    }
 
     private void OrderToBuildNewBase(Transform flag)
     {
@@ -146,11 +110,22 @@ public class Base : MonoBehaviour
                 _resources.Add(obj.Key, obj.Value);
     }
 
+    private void SetSelected()
+    {
+        IsSelected = true;
+    }
+
+    private void SetUnselected()
+    {
+        IsSelected = false;
+    }
+
     private void Subscribe()
     {
+        _colorChanger.Selected += SetSelected;
+        _colorChanger.Unselected += SetUnselected;
         _botSpawner.BotSpawned += AddNewBot;
         _scanner.FillingStarted += FillResources;
-        _interactor.BaseClicked += ChangeBaseSelect;
         _flagger.CanBuildNewBase += OrderToBuildNewBase;
     }
 
@@ -159,7 +134,8 @@ public class Base : MonoBehaviour
         foreach (Bot bot in _bots)
             bot.ResourceArrived -= DeleteCollectedResource;
 
-        _interactor.BaseClicked -= ChangeBaseSelect;
+        _colorChanger.Selected -= SetSelected;
+        _colorChanger.Unselected -= SetUnselected;
         _botSpawner.BotSpawned -= AddNewBot;
         _scanner.FillingStarted -= FillResources;
     }

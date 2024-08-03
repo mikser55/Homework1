@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private const float UpdateInterval = 5f;
+    private const float UpdateInterval = 6f;
 
     [SerializeField] private List<Base> _bases = new();
 
-    private List<Resource> _allResources = new();
+    private readonly Dictionary<Resource, bool> _allResources = new();
 
     private void Start()
     {
@@ -21,14 +21,6 @@ public class GameManager : MonoBehaviour
         if (!_bases.Contains(baseInstance))
         {
             _bases.Add(baseInstance);
-        }
-    }
-
-    public void AddResource(Resource resource)
-    {
-        if (!_allResources.Contains(resource))
-        {
-            _allResources.Add(resource);
         }
     }
 
@@ -46,13 +38,15 @@ public class GameManager : MonoBehaviour
     private void AssignBotsToResources()
     {
         List<Bot> availableBots = _bases.SelectMany(bases => bases.Bots).Where(bot => bot.IsBusy == false).ToList();
-        availableBots = availableBots.OrderBy(x => Random.value).ToList();
+        availableBots = availableBots.OrderBy(randomPosition => Random.value).ToList();
 
         foreach (Base baseInstance in _bases)
         {
-            List<Resource> unassignedResources = baseInstance.NearbyResources
+            CollectAllResources();
+
+            List<Resource> unassignedResources = _allResources
                 .Where(pair => pair.Value == false && !_bases.Any(_base => _base != baseInstance &&
-                _base.NearbyResources.ContainsKey(pair.Key) && _base.NearbyResources[pair.Key]))
+                _allResources.ContainsKey(pair.Key) && _allResources[pair.Key]))
                 .Select(pair => pair.Key)
                 .OrderBy(resource => Vector3.Distance(baseInstance.transform.position, resource.transform.position))
                 .ToList();
@@ -65,6 +59,9 @@ public class GameManager : MonoBehaviour
                 {
                     baseInstance.OrderToCollect(bot, resource.transform);
                     availableBots.Remove(bot);
+
+                    if (_allResources.ContainsKey(resource))
+                        _allResources[resource] = true;
                 }
                 else
                 {
@@ -72,5 +69,15 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void CollectAllResources()
+    {
+        _allResources.Clear();
+
+        foreach (Base baseInstance in _bases)
+            foreach (var resource in baseInstance.NearbyResources)
+                if (!_allResources.ContainsKey(resource.Key))
+                    _allResources.Add(resource.Key, resource.Value);
     }
 }

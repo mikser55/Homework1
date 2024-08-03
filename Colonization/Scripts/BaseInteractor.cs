@@ -12,9 +12,7 @@ public class BaseInteractor : MonoBehaviour
     private EventSystem _eventSystem;
     private bool _isOnGUI;
 
-    public event Action<Base, Color, bool, bool> BaseClicked;
-
-    public bool IsSelected { get; private set; }
+    public event Action<Base, Color, bool> BaseClicked;
 
     private void Awake()
     {
@@ -57,13 +55,13 @@ public class BaseInteractor : MonoBehaviour
                     {
                         if (renderer.material.color == _base.OriginalColor)
                         {
-                            BaseClicked?.Invoke(_base, _selectColor, true, true);
+                            BaseClicked?.Invoke(_base, _selectColor, true);
                         }
                     }
                 }
                 else
                 {
-                    BaseClicked?.Invoke(_base, _originalColor, false, false);
+                    BaseClicked?.Invoke(_base, _originalColor, false);
                 }
             }
         }
