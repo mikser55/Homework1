@@ -52,7 +52,13 @@ public class Product
     public string Name { get; }
 }
 
-public class Warehouse
+public interface IInventory
+{
+    bool TryGetProduct(Product product, int requestedQuantity, out int availableQuantity);
+    void RemoveProduct(Product product, int quantity);
+}
+
+public class Warehouse : IInventory
 {
     private readonly Dictionary<Product, int> _inventory = new Dictionary<Product, int>();
 
@@ -88,10 +94,7 @@ public class Warehouse
         if (requestedQuantity <= 0)
             throw new ArgumentException("Quantity must be positive", nameof(requestedQuantity));
 
-        if (_inventory.TryGetValue(product, out availableQuantity) && availableQuantity >= requestedQuantity)
-            return true;
-
-        return false;
+        return _inventory.TryGetValue(product, out availableQuantity) && availableQuantity >= requestedQuantity;
     }
 
     public void RemoveProduct(Product product, int quantity)
@@ -102,43 +105,42 @@ public class Warehouse
         if (quantity <= 0)
             throw new ArgumentException("Quantity must be positive", nameof(quantity));
 
-        if (_inventory.ContainsKey(product))
-        {
-            _inventory[product] -= quantity;
-
-            if (_inventory[product] <= 0)
-                _inventory.Remove(product);
-        }
-        else
-        {
+        if (!_inventory.ContainsKey(product))
             throw new InvalidOperationException($"Product {product.Name} not found in inventory");
-        }
+
+        if (_inventory[product] < quantity)
+            throw new InvalidOperationException($"Not enough {product.Name} in stock. Available: {_inventory[product]}");
+
+        _inventory[product] -= quantity;
+
+        if (_inventory[product] == 0)
+            _inventory.Remove(product);
     }
 }
 
 public class Shop
 {
-    private readonly Warehouse _warehouse;
+    private readonly IInventory _inventory;
 
-    public Shop(Warehouse warehouse)
+    public Shop(IInventory inventory)
     {
-        _warehouse = warehouse ?? throw new ArgumentNullException(nameof(warehouse));
+        _inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
     }
 
     public Cart CreateCart()
     {
-        return new Cart(_warehouse);
+        return new Cart(_inventory);
     }
 }
 
 public class Cart
 {
     private readonly Dictionary<Product, int> _products = new Dictionary<Product, int>();
-    private readonly Warehouse _warehouse;
+    private readonly IInventory _inventory;
 
-    public Cart(Warehouse warehouse)
+    public Cart(IInventory inventory)
     {
-        _warehouse = warehouse ?? throw new ArgumentNullException(nameof(warehouse));
+        _inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
     }
 
     public void DisplayContents(string title)
@@ -159,23 +161,19 @@ public class Cart
         if (quantity <= 0)
             throw new ArgumentException("Quantity must be positive", nameof(quantity));
 
-        if (_warehouse.TryGetProduct(product, quantity, out int availableQuantity))
-        {
-            if (_products.ContainsKey(product))
-                _products[product] += quantity;
-            else
-                _products.Add(product, quantity);
-        }
-        else
-        {
+        if (!_inventory.TryGetProduct(product, quantity, out int availableQuantity))
             throw new InvalidOperationException($"Not enough {product.Name} in stock. Available: {availableQuantity}");
-        }
+
+        if (_products.ContainsKey(product))
+            _products[product] += quantity;
+        else
+            _products.Add(product, quantity);
     }
 
     public Order PlaceOrder()
     {
         foreach (var item in _products)
-            _warehouse.RemoveProduct(item.Key, item.Value);
+            _inventory.RemoveProduct(item.Key, item.Value);
 
         DisplayContents("Order placed: ");
         _products.Clear();
